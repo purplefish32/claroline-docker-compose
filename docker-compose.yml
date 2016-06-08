@@ -1,15 +1,27 @@
 version: '2'
 services:
-  web:
-    build: .
+  lb:
+    image: 'dockercloud/haproxy:latest'
+    links:
+      - web
     ports:
-      - "99:80"
+      - '80'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  app:
+    build: application/
+
+  web:
+    build: web/
     links:
       - db
+    volumes_from:
+      - app
   db:
     image: mysql
-    ports:
-    - "3306:3306"
+    volumes:
+    - ./mysql/my.cnf:/etc/mysql/conf.d/my.cnf
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_USER: claroline
