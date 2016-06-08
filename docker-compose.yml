@@ -10,7 +10,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
 
   app:
-    build: application/
+    build: app/
 
   web:
     build: web/

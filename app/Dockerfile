@@ -15,7 +15,8 @@ RUN mkdir -p /var/www/html/claroline/web/
 
 WORKDIR /var/www/html/claroline/
 
-RUN chmod -R 777 app/cache/ app/logs/ app/config/ app/sessions/ files/ web/
+RUN chmod -R 777 app/cache app/logs app/config app/sessions/ files/ web/
+COPY ./files/parameters.yml /var/www/html/claroline/app/config/parameters.yml
 
 VOLUME /var/www/html/claroline
 
