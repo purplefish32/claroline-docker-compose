@@ -43,11 +43,6 @@ RUN rm -r wkhtmltox
 
 WORKDIR /var/www/html/claroline
 
-RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-RUN php composer-setup.php
-RUN php -r "unlink('composer-setup.php');"
-RUN mv composer.phar /usr/local/bin/composer
-
 RUN a2dissite 000-default && a2ensite claroline.conf
 
 RUN pecl install apcu-beta \

@@ -2,6 +2,8 @@ version: '2'
 services:
   lb:
     image: 'dockercloud/haproxy:latest'
+    networks:
+      - front
     links:
       - web
     ports:
@@ -9,23 +11,44 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
 
-  app:
-    build: app/
+  claroline:
+    build: claroline/
+    volumes:
+      - data:/var/www/html/claroline
 
   web:
     build: web/
-    links:
-      - db
-    volumes_from:
-      - app
+    networks:
+      - front
+      - back
     environment:
       VIRTUAL_HOST: claroline.loc
+    volumes_from:
+      - claroline
+
   db:
     image: mysql
+    networks:
+      - back
     volumes:
-    - ./mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+      - mysql:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_USER: claroline
       MYSQL_PASSWORD: claroline
       MYSQL_DATABASE: claroline
+
+  chat:
+    image: prosody/prosody
+    ports:
+      - '81:80'
+      - '5222:5222'
+
+networks:
+  front:
+  back:
+
+volumes:
+  data:
+  mysql:
