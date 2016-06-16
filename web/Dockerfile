@@ -18,7 +18,6 @@ RUN apt-get update && apt-get install -y \
   libldap2-dev \
   libpng12-dev \
   libjpeg-dev \
-  npm \
   zlib1g-dev \
   libicu-dev \
   g++
@@ -27,10 +26,6 @@ RUN docker-php-ext-install -j$(nproc) xml mcrypt mysqli curl zip mbstring gettex
 RUN docker-php-ext-configure intl
 RUN docker-php-ext-install intl
 RUN docker-php-ext-configure ldap --with-libdir=lib/x86_64-linux-gnu/ && docker-php-ext-install ldap
-
-RUN npm cache clean -f \
-  && npm install -g n \
-  && n 5.11.1
 
 COPY ./files/apache2/claroline.conf /etc/apache2/sites-available/
 
