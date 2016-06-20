@@ -1,6 +1,7 @@
 version: '2'
 services:
   lb:
+    restart: always
     image: 'dockercloud/haproxy:latest'
     networks:
       - front
@@ -11,22 +12,19 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
 
-  claroline:
-    build: claroline/
-    volumes:
-      - data:/var/www/html/claroline
-
   web:
+    restart: always
     build: web/
     networks:
       - front
       - back
     environment:
       VIRTUAL_HOST: claroline.loc
-    volumes_from:
-      - claroline
+    volumes:
+      - data:/var/www/html/claroline
 
   db:
+    restart: always
     image: mysql
     networks:
       - back
@@ -40,10 +38,16 @@ services:
       MYSQL_DATABASE: claroline
 
   chat:
+    restart: always
     image: prosody/prosody
     ports:
       - '81:80'
       - '5222:5222'
+
+  tools:
+    build: tools/
+    volumes:
+      - data:/var/www/html/claroline
 
 networks:
   front:

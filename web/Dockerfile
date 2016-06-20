@@ -5,6 +5,7 @@ MAINTAINER Donovan Tengblad
 RUN a2enmod rewrite expires
 
 RUN apt-get update && apt-get install -y \
+  git \
   wget \
   unzip \
   zip \
@@ -20,12 +21,21 @@ RUN apt-get update && apt-get install -y \
   libjpeg-dev \
   zlib1g-dev \
   libicu-dev \
-  g++
+  g++ \
+  curl \
+  npm
 
 RUN docker-php-ext-install -j$(nproc) xml mcrypt mysqli curl zip mbstring gettext pdo_mysql gd
 RUN docker-php-ext-configure intl
 RUN docker-php-ext-install intl
 RUN docker-php-ext-configure ldap --with-libdir=lib/x86_64-linux-gnu/ && docker-php-ext-install ldap
+
+RUN npm cache clean -f \
+    && npm install -g n \
+    && n 5.11.1
+
+RUN curl -sS https://getcomposer.org/installer | php
+RUN mv composer.phar /usr/local/bin/composer
 
 COPY ./files/apache2/claroline.conf /etc/apache2/sites-available/
 
