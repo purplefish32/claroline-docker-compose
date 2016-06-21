@@ -2,7 +2,7 @@ FROM php:7.0.7-apache
 
 MAINTAINER Donovan Tengblad
 
-RUN a2enmod rewrite expires
+RUN a2enmod rewrite expires ssl
 
 RUN apt-get update && apt-get install -y \
   git \
@@ -22,6 +22,7 @@ RUN apt-get update && apt-get install -y \
   zlib1g-dev \
   libicu-dev \
   g++ \
+  ssl-cert \
   curl \
   npm
 
@@ -38,6 +39,7 @@ RUN curl -sS https://getcomposer.org/installer | php
 RUN mv composer.phar /usr/local/bin/composer
 
 COPY ./files/apache2/claroline.conf /etc/apache2/sites-available/
+COPY ./files/apache2/claroline-ssl.conf /etc/apache2/sites-available/
 
 RUN wget http://download.gna.org/wkhtmltopdf/0.12/0.12.3/wkhtmltox-0.12.3_linux-generic-amd64.tar.xz
 RUN tar -xf wkhtmltox-0.12.3_linux-generic-amd64.tar.xz
@@ -48,10 +50,12 @@ RUN rm -r wkhtmltox
 
 WORKDIR /var/www/html/claroline
 
-RUN a2dissite 000-default && a2ensite claroline.conf
+RUN a2dissite 000-default && a2dissite default-ssl && a2ensite claroline.conf && a2ensite claroline-ssl.conf
 
 RUN pecl install apcu-beta \
     && echo extension=apcu.so > /usr/local/etc/php/conf.d/apcu.ini
+
+RUN make-ssl-cert generate-default-snakeoil --force-overwrite
 
 COPY config/php.ini /usr/local/etc/php/
 
