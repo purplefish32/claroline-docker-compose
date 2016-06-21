@@ -18,10 +18,10 @@ services:
     networks:
       - front
       - back
-    environment:
-      VIRTUAL_HOST: claroline.loc
     volumes:
       - data:/var/www/html/claroline
+    environment:
+      VIRTUAL_HOST: claroline.loc
 
   db:
     restart: always
