@@ -28,14 +28,14 @@ services:
       image: 'osixia/openldap:1.1.3'
       networks:
           - back
-      ports:
-          - '389:389'
-          - '636:636'
+          - front
       environment:
           LDAP_DOMAIN: example.com
           LDAP_ORGANISATION: example
           LDAP_ADMIN_PASSWORD: admin
-
+          LDAP_TLS: False
+    #   volumes:
+    #       - ldap:/etc/ldap/slapd.d
   db:
     restart: always
     image: mysql
