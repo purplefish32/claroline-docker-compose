@@ -9,6 +9,7 @@ services:
       - web
     ports:
       - '80:80'
+      - '443:443'
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
 
@@ -20,12 +21,12 @@ services:
       - back
     volumes:
       - data:/var/www/html/claroline
+      - /var/www/html/claroline:/var/www/html/claroline:rw
     environment:
       VIRTUAL_HOST: claroline.loc
 
   ldap:
       restart: always
-    #   image: 'osixia/openldap:1.1.3'
       build: ldap/
       networks:
           - back

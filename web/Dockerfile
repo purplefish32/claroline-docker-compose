@@ -22,9 +22,9 @@ RUN apt-get update && apt-get install -y \
   zlib1g-dev \
   libicu-dev \
   g++ \
-  ssl-cert \
   curl \
-  npm
+  npm \
+  vim
 
 RUN docker-php-ext-install -j$(nproc) xml mcrypt mysqli curl zip mbstring gettext pdo_mysql gd
 RUN docker-php-ext-configure intl
@@ -48,6 +48,9 @@ RUN mv wkhtmltox/bin/wkhtmltopdf /usr/bin/wkhtmltopdf.sh
 RUN mv wkhtmltox/bin/wkhtmltoimage /usr/bin/wkhtmltoimage.sh
 RUN rm -r wkhtmltox
 
+RUN mkdir /etc/apache2/ssl
+RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/apache2/ssl/apache.key -out /etc/apache2/ssl/apache.crt -subj "/C=US/ST=FL/L=Ocala/O=Home/CN=example.com"
+
 WORKDIR /var/www/html/claroline
 
 RUN a2dissite 000-default && a2dissite default-ssl && a2ensite claroline.conf && a2ensite claroline-ssl.conf
@@ -55,8 +58,7 @@ RUN a2dissite 000-default && a2dissite default-ssl && a2ensite claroline.conf &&
 RUN pecl install apcu-beta \
     && echo extension=apcu.so > /usr/local/etc/php/conf.d/apcu.ini
 
-RUN make-ssl-cert generate-default-snakeoil --force-overwrite
-
 COPY config/php.ini /usr/local/etc/php/
+
 
 CMD ["apache2-foreground"]
