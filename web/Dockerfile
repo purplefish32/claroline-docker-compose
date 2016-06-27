@@ -22,9 +22,9 @@ RUN apt-get update && apt-get install -y \
   zlib1g-dev \
   libicu-dev \
   g++ \
-  ssl-cert \
   curl \
-  npm
+  npm \
+  vim
 
 RUN docker-php-ext-install -j$(nproc) xml mcrypt mysqli curl zip mbstring gettext pdo_mysql gd
 RUN docker-php-ext-configure intl
@@ -55,8 +55,7 @@ RUN a2dissite 000-default && a2dissite default-ssl && a2ensite claroline.conf &&
 RUN pecl install apcu-beta \
     && echo extension=apcu.so > /usr/local/etc/php/conf.d/apcu.ini
 
-RUN make-ssl-cert generate-default-snakeoil --force-overwrite
-
 COPY config/php.ini /usr/local/etc/php/
+
 
 CMD ["apache2-foreground"]
