@@ -12,10 +12,9 @@ services:
       - '443:443'
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - /etc/apache2/ssl/cert1.pem:/certs/cert1.pem
+      - /home/nico/Documents/toto.pem:/certs/cert1.pem
     environment:
       CERT_FOLDER: /certs/
-
   web:
     restart: always
     build: web/
@@ -25,9 +24,9 @@ services:
     volumes:
       - data:/var/www/html/claroline
       - /var/www/html/claroline:/var/www/html/claroline:rw
-      - /etc/apache2/ssl/cert1.pem:/certs/cert1.pem
+      - /home/nico/Documents/toto.pem:/certs/cert1.pem
     environment:
-      VIRTUAL_HOST: http://claroline.loc, https://claroline.loc
+      VIRTUAL_HOST: http://chat.claroline.com, https://chat.claroline.com
   ldap:
       restart: always
       build: ldap/
@@ -39,8 +38,6 @@ services:
           LDAP_ORGANISATION: example
           LDAP_ADMIN_PASSWORD: admin
           LDAP_TLS: False
-    #   volumes:
-    #       - ldap:/etc/ldap/slapd.d
   db:
     restart: always
     image: mysql
