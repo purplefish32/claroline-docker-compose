@@ -12,7 +12,7 @@ services:
       - '443:443'
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - /home/nico/Documents/toto.pem:/certs/cert1.pem
+      - ./web/files/apache2/certroot.pem:/certs/cert1.pem
     environment:
       CERT_FOLDER: /certs/
   web:
@@ -24,9 +24,9 @@ services:
     volumes:
       - data:/var/www/html/claroline
       - /var/www/html/claroline:/var/www/html/claroline:rw
-      - /home/nico/Documents/toto.pem:/certs/cert1.pem
+      - ./web/files/apache2/certroot.pem:/certs/cert1.pem
     environment:
-      VIRTUAL_HOST: http://chat.claroline.com, https://chat.claroline.com
+      VIRTUAL_HOST: http://claroline.loc https://claroline.loc
   ldap:
       restart: always
       build: ldap/
@@ -51,14 +51,17 @@ services:
       MYSQL_USER: claroline
       MYSQL_PASSWORD: claroline
       MYSQL_DATABASE: claroline
-
   chat:
     restart: always
     image: prosody/prosody
     ports:
       - '81:80'
       - '5222:5222'
-
+      - '5280:5280'
+      - '5281:5281'
+    volumes:
+      - ./web/files/apache2/cert1.pem:/etc/prosody/certs/cert1.pem
+      # - ./prosody/prosody.cfg.lua:/etc/prosody/prosody.cfg.lua
   tools:
     build: tools/
     volumes:
