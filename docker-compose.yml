@@ -12,6 +12,9 @@ services:
       - '443:443'
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - /etc/apache2/ssl/cert1.pem:/certs/cert1.pem
+    environment:
+      CERT_FOLDER: /certs/
 
   web:
     restart: always
@@ -22,9 +25,9 @@ services:
     volumes:
       - data:/var/www/html/claroline
       - /var/www/html/claroline:/var/www/html/claroline:rw
+      - /etc/apache2/ssl/cert1.pem:/certs/cert1.pem
     environment:
-      VIRTUAL_HOST: claroline.loc
-
+      VIRTUAL_HOST: http://claroline.loc, https://claroline.loc
   ldap:
       restart: always
       build: ldap/

@@ -48,9 +48,6 @@ RUN mv wkhtmltox/bin/wkhtmltopdf /usr/bin/wkhtmltopdf.sh
 RUN mv wkhtmltox/bin/wkhtmltoimage /usr/bin/wkhtmltoimage.sh
 RUN rm -r wkhtmltox
 
-RUN mkdir /etc/apache2/ssl
-RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/apache2/ssl/apache.key -out /etc/apache2/ssl/apache.crt -subj "/C=US/ST=FL/L=Ocala/O=Home/CN=example.com"
-
 WORKDIR /var/www/html/claroline
 
 RUN a2dissite 000-default && a2dissite default-ssl && a2ensite claroline.conf && a2ensite claroline-ssl.conf
