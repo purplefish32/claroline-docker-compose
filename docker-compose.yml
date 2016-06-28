@@ -12,7 +12,8 @@ services:
       - '443:443'
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./web/files/apache2/certroot.pem:/certs/cert1.pem
+      # - /etc/apache2/ssl/cert1.pem:/certs/cert1.pem
+      - ./web/files/apache2/cert1.pem:/certs/cert1.pem
     environment:
       CERT_FOLDER: /certs/
   web:
@@ -24,9 +25,9 @@ services:
     volumes:
       - data:/var/www/html/claroline
       - /var/www/html/claroline:/var/www/html/claroline:rw
-      - ./web/files/apache2/certroot.pem:/certs/cert1.pem
+      - ./web/files/apache2/cert1.pem:/certs/cert1.pem
     environment:
-      VIRTUAL_HOST: http://claroline.loc https://claroline.loc
+      VIRTUAL_HOST: http://claroline.loc, https://claroline.loc
   ldap:
       restart: always
       build: ldap/
@@ -61,7 +62,6 @@ services:
       - '5281:5281'
     volumes:
       - ./web/files/apache2/cert1.pem:/etc/prosody/certs/cert1.pem
-      # - ./prosody/prosody.cfg.lua:/etc/prosody/prosody.cfg.lua
   tools:
     build: tools/
     volumes:
