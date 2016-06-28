@@ -9,8 +9,13 @@ services:
       - web
     ports:
       - '80:80'
+      - '443:443'
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - /etc/letsencrypt/live/claroline.loc/fullchain.pem:/certs/fullchain.pem
+    environment:
+      CERT_FOLDER: /certs/
+      FORCE_SSL: true
 
   web:
     restart: always
@@ -20,8 +25,10 @@ services:
       - back
     volumes:
       - data:/var/www/html/claroline
+    volumes_from:
+      - lb
     environment:
-      VIRTUAL_HOST: claroline.loc
+      VIRTUAL_HOST: https://claroline.loc
 
   db:
     restart: always

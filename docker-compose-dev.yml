@@ -43,7 +43,7 @@ services:
     volumes:
       - data:/var/www/html/claroline
     environment:
-      VIRTUAL_HOST: http://claroline.loc, http://13b1b9b8.ngrok.io
+      VIRTUAL_HOST: http://claroline.loc
       #VIRTUAL_HOST: http://claroline.loc, https://claroline.loc
 
   db:
