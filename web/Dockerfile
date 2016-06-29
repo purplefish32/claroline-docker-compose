@@ -57,5 +57,6 @@ RUN pecl install apcu-beta \
 
 COPY config/php.ini /usr/local/etc/php/
 
+EXPOSE 8080
 
 CMD ["apache2-foreground"]
