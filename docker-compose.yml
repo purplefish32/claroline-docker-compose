@@ -5,10 +5,20 @@ services:
     image: 'dockercloud/haproxy:latest'
     networks:
       - front
+      - prosody
     links:
       - web
+      - prosody
     ports:
+      #HTTPS
       - '443:443'
+
+      #Prosody
+      - 5222:5222 #c2s port
+      - 5269:5269 #s2s port
+      - 5347:5347 #XMPP component port
+      - 5280:5280 #BOSH / websocket port
+      - 5281:5281 #Secure BOSH / websocket port
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - certs:/certs/
@@ -56,9 +66,11 @@ services:
       - ./prosody/config:/etc/prosody
       - prosody:/var/lib/prosody
     environment:
+      VIRTUAL_HOST: http://xmpp.claroline.loc
+      TCP_PORTS: "5222, 5269, 5347, 5280, 5281"
       LOCAL: admin
       PASSWORD: admin
-      #DOMAIN: localhost
+      DOMAIN: claroline.loc
     networks:
       - prosody
 

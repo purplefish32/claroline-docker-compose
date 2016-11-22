@@ -2,7 +2,7 @@ FROM php:7.0.7-apache
 
 MAINTAINER Donovan Tengblad
 
-RUN a2enmod rewrite expires ssl
+RUN a2enmod rewrite expires ssl headers
 
 RUN apt-get update && apt-get install -y \
   git \
@@ -24,7 +24,8 @@ RUN apt-get update && apt-get install -y \
   g++ \
   ssl-cert \
   curl \
-  npm
+  npm \
+  && rm -rf /var/lib/apt/lists/*
 
 RUN docker-php-ext-install -j$(nproc) xml mcrypt mysqli curl zip mbstring gettext pdo_mysql gd
 RUN docker-php-ext-configure intl
@@ -38,9 +39,6 @@ RUN npm cache clean -f \
 RUN curl -sS https://getcomposer.org/installer | php
 RUN mv composer.phar /usr/local/bin/composer
 
-COPY ./files/apache2/claroline.conf /etc/apache2/sites-available/
-COPY ./files/apache2/claroline-ssl.conf /etc/apache2/sites-available/
-
 RUN wget http://download.gna.org/wkhtmltopdf/0.12/0.12.3/wkhtmltox-0.12.3_linux-generic-amd64.tar.xz
 RUN tar -xf wkhtmltox-0.12.3_linux-generic-amd64.tar.xz
 
@@ -48,17 +46,19 @@ RUN mv wkhtmltox/bin/wkhtmltopdf /usr/bin/wkhtmltopdf.sh
 RUN mv wkhtmltox/bin/wkhtmltoimage /usr/bin/wkhtmltoimage.sh
 RUN rm -r wkhtmltox
 
-WORKDIR /var/www/html/claroline
-
-#RUN a2dissite 000-default && a2dissite default-ssl && a2ensite claroline.conf && a2ensite claroline-ssl.conf
-RUN a2dissite 000-default && a2dissite default-ssl && a2ensite claroline.conf
-
 RUN pecl install apcu-beta \
-    && echo extension=apcu.so > /usr/local/etc/php/conf.d/apcu.ini
+&& echo extension=apcu.so > /usr/local/etc/php/conf.d/apcu.ini
 
 COPY config/php.ini /usr/local/etc/php/
+
+COPY ./files/apache2/claroline.conf /etc/apache2/sites-available/
+COPY ./files/apache2/claroline-ssl.conf /etc/apache2/sites-available/
+
+RUN a2dissite 000-default && a2dissite default-ssl && a2ensite claroline.conf
+
 COPY entrypoint.sh /entrypoint.sh
 
+WORKDIR /var/www/html/claroline
 ENTRYPOINT ["/entrypoint.sh"]
 
 CMD ["apache2-foreground"]
