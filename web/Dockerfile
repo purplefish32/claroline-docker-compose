@@ -50,13 +50,15 @@ RUN rm -r wkhtmltox
 
 WORKDIR /var/www/html/claroline
 
-RUN a2dissite 000-default && a2dissite default-ssl && a2ensite claroline.conf && a2ensite claroline-ssl.conf
+#RUN a2dissite 000-default && a2dissite default-ssl && a2ensite claroline.conf && a2ensite claroline-ssl.conf
+RUN a2dissite 000-default && a2dissite default-ssl && a2ensite claroline.conf
 
 RUN pecl install apcu-beta \
     && echo extension=apcu.so > /usr/local/etc/php/conf.d/apcu.ini
 
-RUN make-ssl-cert generate-default-snakeoil --force-overwrite
-
 COPY config/php.ini /usr/local/etc/php/
+COPY entrypoint.sh /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
 
 CMD ["apache2-foreground"]

@@ -8,33 +8,38 @@ services:
     links:
       - web
     ports:
-      - '80:80'
       - '443:443'
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - /etc/letsencrypt/live/claroline.loc/fullchain.pem:/certs/fullchain.pem
+      - certs:/certs/
     environment:
       CERT_FOLDER: /certs/
-      FORCE_SSL: true
 
   web:
     restart: always
     build: web/
     networks:
       - front
-      - back
+      - db
+      - prosody
     volumes:
       - data:/var/www/html/claroline
-    volumes_from:
-      - lb
+      - certs:/certs/
     environment:
-      VIRTUAL_HOST: https://claroline.loc
+      VIRTUAL_HOST: https://claroline.loc, http://claroline.loc
+      FORCE_SSL: "yes"
+      APP_URL: claroline.loc
+      DB_HOST: db
+      DB_NAME: claroline
+      DB_USER: claroline
+      DB_PASSWORD: claroline
+      SECRET: change_me
 
   db:
     restart: always
     image: mysql
     networks:
-      - back
+      - db
     volumes:
       - ./mysql/my.cnf:/etc/mysql/conf.d/my.cnf
       - mysql:/var/lib/mysql
@@ -44,22 +49,34 @@ services:
       MYSQL_PASSWORD: claroline
       MYSQL_DATABASE: claroline
 
-  chat:
+  prosody:
     restart: always
     image: prosody/prosody
-    ports:
-      - '81:80'
-      - '5222:5222'
-
-  tools:
-    build: tools/
     volumes:
-      - data:/var/www/html/claroline
+      - ./prosody/config:/etc/prosody
+      - prosody:/var/lib/prosody
+    environment:
+      LOCAL: admin
+      PASSWORD: admin
+      #DOMAIN: localhost
+    networks:
+      - prosody
+
+    #Exposed for debug
+    #ports:
+      #- 5222:5222 #c2s port
+      #- 5269:5269 #s2s port
+      #- 5347:5347 #XMPP component port
+      #- 5280:5280 #BOSH / websocket port
+      #- 5281:5281 #Secure BOSH / websocket port
 
 networks:
   front:
-  back:
+  db:
+  prosody:
 
 volumes:
   data:
   mysql:
+  certs:
+  prosody:
