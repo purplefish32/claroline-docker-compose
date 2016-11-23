@@ -44,17 +44,8 @@ log = {
     {levels = {min = "info"}, to = "console"};
 }
 
-VirtualHost "prosody"
-http_host = "prosody"
+VirtualHost "claroline.loc" -- Todo this needs to be called from a variable
 
-VirtualHost "claroline.loc"
-http_host = "claroline.loc"
-
-VirtualHost "xmpp.claroline.loc"
-http_host = "xmpp.claroline.loc"
-
-VirtualHost "web"
-VirtualHost "lb"
 VirtualHost "localhost"
 
 Component "conference.prosody" "muc"
