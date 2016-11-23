@@ -10,19 +10,19 @@ services:
       - web
       - prosody
     ports:
-      #HTTPS
-      - '443:443'
-      #- '80:80' #closeme
 
-      #Prosody
-      - 5222:5222 #c2s port
-      - 5269:5269 #s2s port
-      - 5347:5347 #XMPP component port
-      - 5280:5280 #BOSH / websocket port
-      - 5281:5281 #Secure BOSH / websocket port
+      - '443:443' # HTTPS
+      - '80:80' # HTTP Needs to be exposed for http->https redirection to work
+
+      # Prosody (not sure these are all used)
+      - 5222:5222 # c2s port
+      - 5269:5269 # s2s port
+      - 5347:5347 # XMPP component port
+      - 5280:5280 # BOSH / websocket port
+      - 5281:5281 # Secure BOSH / websocket port
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - certs:/certs/
+      - certs:/certs/ # This is where the ssl certificates live
     environment:
       CERT_FOLDER: /certs/
 
@@ -33,14 +33,15 @@ services:
       - front
       - db
     extra_hosts:
-      - "claroline.loc:172.18.0.3"
+      - "claroline.loc:172.18.0.3" # This is really hacky, but needed so that web can talk to the lb
     volumes:
-      - data:/var/www/html/claroline
-      - certs:/certs/
+      - data:/var/www/html/claroline # This is where the symfony files are stored
+      - certs:/certs/ # This is where the ssl certificates live # This probably shouldent live in the web container
     environment:
-      VIRTUAL_HOST: https://claroline.loc, http://claroline.loc
-      #VIRTUAL_HOST: http://claroline.loc
-      #FORCE_SSL: "yes"
+      VIRTUAL_HOST: https://claroline.loc, http://claroline.loc # Both http and https are needed for http->https redirection to work
+      FORCE_SSL: "yes" # Force redirech http to https
+
+      #These should all be variables
       APP_URL: claroline.loc
       DB_HOST: db
       DB_NAME: claroline
@@ -58,6 +59,8 @@ services:
       - mysql:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: root
+
+      #These should all be variables
       MYSQL_USER: claroline
       MYSQL_PASSWORD: claroline
       MYSQL_DATABASE: claroline
@@ -66,32 +69,23 @@ services:
     restart: always
     image: prosody/prosody
     volumes:
-      - ./prosody/config:/etc/prosody
-      - prosody:/var/lib/prosody
+      - ./prosody/config:/etc/prosody # The prosody config lives here
+      - prosody:/var/lib/prosody # The prosody data lives here
     environment:
-      #VIRTUAL_HOST: http://xmpp.claroline.loc
-      TCP_PORTS: "5222, 5269, 5347, 5280/ssl, 5281/ssl"
+      TCP_PORTS: "5222, 5269, 5347, 5280/ssl, 5281/ssl" # Todo : try eliminating some of these ports
       LOCAL: admin
       PASSWORD: admin
       DOMAIN: claroline.loc
     networks:
       - prosody
 
-    #Exposed for debug
-    #ports:
-      #- 5222:5222 #c2s port
-      #- 5269:5269 #s2s port
-      #- 5347:5347 #XMPP component port
-      #- 5280:5280 #BOSH / websocket port
-      #- 5281:5281 #Secure BOSH / websocket port
-
 networks:
-  front:
-  db:
-  prosody:
+  front: # The frontend network
+  db: # The database network
+  prosody: # The prosody / chat network
 
 volumes:
-  data:
-  mysql:
-  certs:
-  prosody:
+  data:  # This is where the symfony files are stored
+  mysql: # This is where the mysql data lives
+  certs: # This is where the ssl certificates live
+  prosody: # The prosody data lives here
