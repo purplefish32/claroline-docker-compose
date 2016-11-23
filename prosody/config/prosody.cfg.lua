@@ -1,5 +1,8 @@
 daemonize = false;
 
+cross_domain_bosh = true
+consider_bosh_secure = true
+
 admins = { }
 
 modules_enabled = {
@@ -50,11 +53,9 @@ http_host = "claroline.loc"
 VirtualHost "xmpp.claroline.loc"
 http_host = "xmpp.claroline.loc"
 
+VirtualHost "web"
+VirtualHost "lb"
 VirtualHost "localhost"
-
--- A tester
-cross_domain_bosh = true
-consider_bosh_secure = true
 
 Component "conference.prosody" "muc"
 	name = "The claroline chatroom server"

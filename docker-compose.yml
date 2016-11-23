@@ -12,6 +12,7 @@ services:
     ports:
       #HTTPS
       - '443:443'
+      #- '80:80' #closeme
 
       #Prosody
       - 5222:5222 #c2s port
@@ -31,13 +32,15 @@ services:
     networks:
       - front
       - db
-      - prosody
+    extra_hosts:
+      - "claroline.loc:172.18.0.3"
     volumes:
       - data:/var/www/html/claroline
       - certs:/certs/
     environment:
       VIRTUAL_HOST: https://claroline.loc, http://claroline.loc
-      FORCE_SSL: "yes"
+      #VIRTUAL_HOST: http://claroline.loc
+      #FORCE_SSL: "yes"
       APP_URL: claroline.loc
       DB_HOST: db
       DB_NAME: claroline
@@ -66,8 +69,8 @@ services:
       - ./prosody/config:/etc/prosody
       - prosody:/var/lib/prosody
     environment:
-      VIRTUAL_HOST: http://xmpp.claroline.loc
-      TCP_PORTS: "5222, 5269, 5347, 5280, 5281"
+      #VIRTUAL_HOST: http://xmpp.claroline.loc
+      TCP_PORTS: "5222, 5269, 5347, 5280/ssl, 5281/ssl"
       LOCAL: admin
       PASSWORD: admin
       DOMAIN: claroline.loc
